@@ -2,3 +2,5 @@ To run a ad-hoc command --------------->ansible <hosts> -m < module name/command
 
 To run a sheel ad-hoc command ------------->ansible <hosts>  -m shell -a <command or module>  -u <username> -k  -s -K 
 
+Serach for setup values --------------> asnible <hosts> -m setup -a 'filter=<content to filter>'
+
