@@ -1,4 +1,4 @@
 To run a ad-hoc command --------------->ansible <hosts> -m < module name/command> -u <username> --ask-pass -s -K
 
-To run a sheel ad-hoc command ------------->ansible <hosts> -s -m shell -a <command or module>  -u <username> -k  -s -K 
+To run a sheel ad-hoc command ------------->ansible <hosts>  -m shell -a <command or module>  -u <username> -k  -s -K 
 
