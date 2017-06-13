@@ -1,0 +1,11 @@
+- hosts: all
+  remote_user: <unixsa>
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: <checking the root password age> 
+    shell: <chage -l root | grep "Last password change">
+    register: <chage>
+
+  - debug: msg="{{ chage.stdout }}"
+  - debug: var=chage.stdout_lines   --------- you can use either of this lines to get the output on the stdout 
