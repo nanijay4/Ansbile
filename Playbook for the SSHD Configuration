@@ -1,0 +1,30 @@
+--- # Ansible Play Book for SSHD Configuration
+- hosts:
+  remote_user: root
+  become: yes
+  become_method: sudo
+  connection: ssh
+  gather_facts: yes
+  var_files:
+    - conf/sshd_config_attributes.yml (create a dir called conf under the current directory and the conig_attributes.yml file) 
+    - conf/ssh_config_attributes.yml
+  tasks:
+    - name: Install Openssh Server and Client Packages
+      action: yum name={{ item }} state=installed
+      with_items:
+        - openssh
+        - openssh-server
+        - openssh-clients
+    - name: Start the SSHD Service
+      service: name=sshd state=started
+    - name: Enable SSHD Service
+      service: name=sshd enabled=yes
+    - name: Install the SSHD configuration file the Server (create a template file under conf file with .j2 extension) 
+      template: src=conf/sshd_config.j2 dest=/etc/ssh/sshd_config owner=root group=root mode=644 validate="/"
+      notify: Restart sshd service
+    - name: Install the SSH Client configuration file on the Server
+      template: src=conf/ssh_config.j2 dest=/etc/ssh/ssh_config owner=root group=root mode=644
+      notify: Restart sshd service
+  handlers:
+    - name: Restart sshd service
+      action: service name=sshd state=restarted
