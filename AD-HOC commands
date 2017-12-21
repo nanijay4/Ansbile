@@ -4,3 +4,4 @@ To run a sheel ad-hoc command ------------->ansible <hosts>  -m shell -a <comman
 
 Serach for setup values --------------> asnible <hosts> -m setup -a 'filter=<content to filter>'
 
+to Specify the Inventory file -----------> ansible -i <inventory file> {all} -m ping -u <username> -k 
