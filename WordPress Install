@@ -1,0 +1,92 @@
+---
+  - hosts: all
+    remote_user: root
+    become: yes
+    become_method: sudo
+    tasks:
+      - name: 1. install httpd
+        yum:
+          name: httpd
+          state: present
+      - name: 2. Install PHP Modules for Apache
+        yum:
+          name: "{{ item }}"
+          state: present
+        with_items:
+          - php
+          - php-mysql
+          - libselinux-python
+      - name: 3. Starting and enablinh httpd service
+        systemd:
+          name: httpd
+          enabled: yes
+          state: started
+
+      - name: 4. Install Hello World php Script
+        copy:
+          src: ./index.php
+          dest: /var/www/html/index.php
+          mode: 0644
+
+      - name: 5. Install MariaDB Server package
+        yum:
+          name: "{{ item }}"
+          state: present
+        with_items:
+          - mariadb-server
+          - mariadb
+          - MySQL-python
+          - wget
+
+      - name: 6.Start MySql service
+        service:
+          name: mariadb
+          state: started
+          enabled: true
+
+      - name: create a new database
+        mysql_db:
+          name: wordpress
+          state: present
+          collation: utf8_general_ci
+
+      - name: Create a Database user
+        mysql_user:
+          name: wordpressuser
+          password: wordpress
+          priv: '*.*:ALL'
+          host: localhost
+          state: present
+
+      - name: 6.Install PHP Requirements for Word wordpress
+        yum:
+          name: php-gd
+          state: present
+      - name: 7.Downlaod wordpress
+        get_url:
+          url: http://wordpress.org/latest.tar.gz
+          dest: /root/
+      - name: 8. Unarchive
+        unarchive:
+          remote_src: yes
+          src: /root/wordpress-4.9.8.tar.gz
+          dest: /root
+      - name:
+        synchronize:
+          src: /root/wordpress
+          dest: /var/www/html
+      - name: Create Directroy
+        file:
+          path: /var/www/html/wp-content/uploads
+          state: directory
+      - name: change permissions
+        file:
+          dest: /var/www/html
+          owner: apache
+          group: apache
+          recurse: yes
+      - name: 4. Install Hello World php Script
+        copy:
+          src: ./wp-config.php
+          dest: /var/www/html/wp-config.php
+          mode: 0644
