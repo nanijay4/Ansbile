@@ -1,0 +1,62 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  remote_user: <user used>
+  tasks:
+
+  - name: Sending an Email before patching 
+    mail:
+      subject: 'OS Patching for {{ ansible_fqdn }}  is beginning now.'
+      body: 'Automated OS patching for {{ ansible_fqdn }}  is beginning now.'
+      to: '<to email address>'
+      #charset: ut8
+    #delegate_to: localhost
+    tags: mail
+
+  - name: Updating the Operating System
+    yum:
+      name: "*"
+      state: latest
+
+  - name: Comparing the last kernel and running kernel
+    shell: |
+     LAST_KERNEL=$(rpm -q --last kernel | perl -pe 's/^kernel-(\S+).*/$1/' | head -1)
+     CURRENT_KERNEL=$(uname -r)
+     if [[ $LAST_KERNEL != $CURRENT_KERNEL ]]; then
+        touch /tmp/reboot
+     fi
+
+  - name: Checking to see if  reboot is needed 
+    stat:
+      path: /tmp/reboot
+    register: reboot
+
+  - name: Removing the /tmp/reboot file if present
+    file:
+      path: /tmp/reboot
+      state: absent
+    when: reboot.stat.exists == true
+
+  - name: In a procress of reboot 
+    shell: sleep 2 && /sbin/shutdown -r now "Reboot required to update kernel." && sleep 2
+    async: 20
+    poll: 0
+    when: reboot.stat.exists == true
+
+  - name: Waiting for host to reboot 
+    wait_for_connection:
+      connect_timeout: 20
+      delay: 60
+      timeout: 300
+    when: reboot.stat.exists == true
+
+  - name: Sending an email after patching
+    mail:
+      subject: 'OS Patching for  has been completed now.' 
+      body: 'Automated OS patching for {{ ansible_fqdn }} has been completed  now.'
+      to: '<to email address>'
+      #charset: ut8
+    #delegate_to: localhost
+    tags: mail
