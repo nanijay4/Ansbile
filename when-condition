@@ -9,7 +9,10 @@
 
   - name: Download reston package
     command: curl --insecure --output katello-ca-consumer-latest.noarch.rpm https://infvmrhnsat03.medassurant.local/pub/katello-ca-consumer-latest.noarch.rpm
-    when: ansible_facts['ansible_default_ipv4.address'] == '172.25.[0-9].[0-9]'
+    when: ansible_facts['ansible_default_ipv4.address'] == '172.25.[0-9][0-9][0-9].[0-9][0-9][0-9]'
+    #### try the below code for when condition 
+    when: "ansible_default_ipv4_address == '172.25.[0-9][0-9][0-9].[0-9][0-9][0-9]'"
+    
 
   - name: Download Phoenix package
     command: curl --insecure --output katello-ca-consumer-latest.noarch.rpm https://phcappr01.medassurant.local/pub/katello-ca-consumer-latest.noarch.rpm
