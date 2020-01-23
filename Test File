@@ -1,1 +1,42 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "password"
+      prompt: "Enter password to connect"
+      private: yes
+  vars_files:
+    - /root/ansiblevms/ansiblevms.yml
+  tasks:
+    - name: Clone from template
+      vmware_guest:
+        hostname: "{{item.vmhostname}}"
+        username: sa_jayanth.marneni
+        password: "{{ password }}"
+        validate_certs: False
+        name: "{{item.vmhost}}"
+        template: "{{item.vmtemplate}}"
+        folder: "{{item.vmfolder}}"
+        cluster: "{{item.vmcluster}}"
+        disk:
+          - size_gb: "{{item.value}}"
+            type: thin
+            datastore: "{{item.vmdatastore}}"
+        loop: "{{ q('dict', vmware_disks) }}"
+        hardware:
+          memory_gb: "{{item.vmmemory}}"
+          num_cpus: "{{item.vmcpus}}"
+        networks:
+          - name: "{{item.vmnetwork}}"
+            ip: "{{item.vmip}}"
+            netmask: "{{item.vmnetmask}}"
+            gateway: "{{item.vmgateway}}"
+            type: static
+            dns_servers:
+              - "{{item.vmdns1}}"
+              - "{{item.vmdns2}}"
+        state: poweredon
+        wait_for_ip_address: yes
+      delegate_to: localhost
+      loop: "{{ lookup('dict', vms, wantlist=True) }}"
 
