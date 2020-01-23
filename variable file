@@ -1,1 +1,21 @@
+---
+vms:
+  vm1:
+    vmhostname: rsvc2.inovalon.local
+    vmhost: ansible-vm
+    vmtemplate: rstestvm01
+    vmfolder: /RSDC/vm
+    vmcluster: RS-Redhat-Bigdata-NonProduction-01
+    vmdatastore: VCE_VMAX_BD01_NP_0045
+    vmnetwork: non-production|apNon-ProductionCorp|epNon-ProdApp
+    vmip: 172.25.72.124
+    vmnetmask: 255.255.252.0
+    vmgateway: 172.25.72.1
+    vmdns1: 172.24.132.100
+    vmdns2: 172.24.132.101
+    vmmemory: 4096
+    vmcpus: 4
+    vmware_disks:
+      disk1: 50
+      disk2: 50
 
